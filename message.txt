@@ -1,0 +1,133 @@
+davidhos
+davidhos
+Online
+bulpul, Calvin.W
+
+davidhos — 2024-11-05 6:12 PM
+Hello
+Image
+https://drive.google.com/open?id=1Ho4cBRHdOkPfZJlaJkPF8rXwgTyyA7Eky0IieLrlnEg
+Google Docs
+SENIOR DESIGN PRELIMINARY COMPETITOR PACKAGE
+C-ENG-C - SENIOR DESIGN 2024 Preliminary Competitor Package Required and Recommended Items to Bring: You will require the following tools to be able to compete: At least one laptop with the Arduino IDE installed Exacto knife & cutting board/mat for shaping cardboard Scissors Small flathead scr...
+Image
+Image
+https://forms.gle/g5F42RGWYnRHwYeWA
+Google Forms: Sign-in
+Access Google Forms with a personal Google account or Google Workspace account (for business use).
+This is the link to add your resume
+davidhos — 2024-11-13 3:59 PM
+We need to meet before Sunday. Im thinking friday night we meet then watch the Mike Tyson fight
+War Room Preparation
+Calvin.W — 2024-11-13 5:15 PM
+Yes sir🤫🧏🏾‍♂️
+bulpul — 2024-11-15 3:23 PM
+When are we planning on meeting? And where
+davidhos — 2024-11-15 3:26 PM
+I have a lot to do tonight and I’m going out for dinner. I’ll let you know when I’m done but the fight starts at 8. We can miss the undercards I don’t really care about them all that much
+Calvin.W — 2024-11-15 6:26 PM
+Where are meeting
+Calvin.W — Today at 2:45 PM
+here
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "Adafruit_TCS34725.h"
+
+// Initialize the motor shield and two motors
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
+Expand
+message.txt
+3 KB
+bulpul — Today at 2:47 PM
+https://www.youtube.com/watch?v=ynvbyMkM4r4
+YouTube
+Wassana D Project
+HW-130 L293D บอร์ดขับมอเตอร์ สเตปมอเตอร์ เซอร์โว ควบคุมด้วย Arduino...
+Image
+﻿
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "Adafruit_TCS34725.h"
+
+// Initialize the motor shield and two motors
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
+Adafruit_DCMotor *motor1 = AFMS.getMotor(1); // Motor 1 on M1
+Adafruit_DCMotor *motor2 = AFMS.getMotor(2); // Motor 2 on M2
+
+// Initialize the color sensor
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Color Sensor Dual Motor Control");
+
+  // Start Motor Shield
+  if (!AFMS.begin()) {
+    Serial.println("Motor Shield not found!");
+    while (1);
+  }
+
+  // Start Color Sensor
+  if (!tcs.begin()) {
+    Serial.println("No TCS34725 color sensor found!");
+    while (1);
+  }
+
+  // Initialize motors
+  motor1->setSpeed(0); // Start stopped
+  motor1->run(RELEASE); 
+  motor2->setSpeed(0); // Start stopped
+  motor2->run(RELEASE); 
+}
+
+void loop() {
+  uint16_t r, g, b, c; // Variables to store color sensor readings
+  float redNorm, greenNorm, blueNorm;
+
+  // Read color sensor data
+  tcs.getRawData(&r, &g, &b, &c);
+  
+  // Normalize color values
+  redNorm = r / (float)c * 255;
+  greenNorm = g / (float)c * 255;
+  blueNorm = b / (float)c * 255;
+
+  Serial.print("R: "); Serial.print(redNorm, 2);
+  Serial.print(" G: "); Serial.print(greenNorm, 2);
+  Serial.print(" B: "); Serial.println(blueNorm, 2);
+
+  // Control logic for motors based on detected color
+  if (redNorm > 150 && greenNorm < 100 && blueNorm < 100) {
+    // Red detected
+    Serial.println("Red detected! Motor1 at full speed, Motor2 stopped.");
+    motor1->setSpeed(255); // Motor1 full speed
+    motor1->run(FORWARD);
+    motor2->setSpeed(0);   // Motor2 stopped
+    motor2->run(RELEASE);
+  } else if (greenNorm > 150 && redNorm < 100 && blueNorm < 100) {
+    // Green detected
+    Serial.println("Green detected! Motor1 at half speed, Motor2 at full speed.");
+    motor1->setSpeed(128); // Motor1 half speed
+    motor1->run(FORWARD);
+    motor2->setSpeed(255); // Motor2 full speed
+    motor2->run(FORWARD);
+  } else if (blueNorm > 150 && redNorm < 100 && greenNorm < 100) {
+    // Blue detected
+    Serial.println("Blue detected! Motor1 and Motor2 at slow speed.");
+    motor1->setSpeed(64);  // Motor1 slow speed
+    motor1->run(FORWARD);
+    motor2->setSpeed(64);  // Motor2 slow speed
+    motor2->run(FORWARD);
+  } else {
+    // No specific color detected
+    Serial.println("No dominant color. Motors stopped.");
+    motor1->setSpeed(0);   // Stop both motors
+    motor1->run(RELEASE);
+    motor2->setSpeed(0);
+    motor2->run(RELEASE);
+  }
+
+  delay(500); // Small delay for stability
+}
+message.txt
+3 KB
